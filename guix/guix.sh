@@ -25,14 +25,13 @@ herd start cow-store /mnt
 guix pull --substitute-urls=https://bordeaux.guix.gnu.org
 bash -c "guix install git --substitute-urls=https://bordeaux.guix.gnu.org"
 cd /mnt
-bash -c "git clone https://github.com/KefirOnPremise/deprecated.git"
+bash -c "git clone https://github.com/KefirOnPremise/init.git"
 guix pull \
-     -C ./deprecated/etc/channels \
-     --disable-authentication \
+     -C ./init/guix/channels \
      --allow-downgrades \
      --substitute-urls=https://bordeaux.guix.gnu.org
 bash \
     -c "
-guix system init /mnt/deprecated/etc/sysconfs/imp /mnt \
+guix system init /mnt/init/guix/sysconfs/imp_virtbox /mnt \
      --substitute-urls=https://bordeaux.guix.gnu.org
 "

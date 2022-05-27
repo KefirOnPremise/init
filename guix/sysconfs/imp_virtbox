@@ -1,0 +1,79 @@
+(use-modules (gnu))
+(use-service-modules cups
+		     desktop
+		     networking
+		     ssh
+		     xorg
+		     docker)
+
+(define %my-desktop-services
+  (modify-services
+   %desktop-services
+   (guix-service-type
+    config =>
+    (guix-configuration
+     (inherit config)
+     (substitute-urls
+      `("https://bordeaux.guix.gnu.org/"))
+     (authorized-keys
+      (append
+       (list
+	(plain-file
+	 "bordeaux.guix.gnu.org.signing.key"
+	 "
+(public-key
+ (ecc
+  (curve Ed25519)
+  (q #7D602902D3A2DBB83F8A0FB98602A754C5493B0B778C8D1DD4E0F41DE14DE34F#)
+  )
+ )"))
+       %default-authorized-guix-keys))))))
+
+(operating-system
+  (locale "en_US.utf8")
+  (timezone "Europe/Moscow")
+  (keyboard-layout (keyboard-layout "us"))
+  (host-name "imp0")
+  (users (cons* (user-account
+		 (name "user")
+		 (comment "-_-")
+		 (group "users")
+		 (home-directory "/home/user")
+		 (supplementary-groups
+		  '("wheel" "netdev" "audio" "video" "docker")))
+		%base-user-accounts))
+  (packages
+   (append
+    (list (specification->package "emacs")
+	  (specification->package "emacs-exwm")
+	  (specification->package "emacs-magit")
+	  (specification->package "emacs-yasnippet")
+	  (specification->package "emacs-kefir-stuff")
+	  (specification->package
+	   "emacs-desktop-environment")
+	  (specification->package "nss-certs"))
+    %base-packages))
+  (services
+   (append
+    (list (service openssh-service-type)
+	  (service tor-service-type)
+	  (service docker-service-type)
+	  (set-xorg-configuration
+	   (xorg-configuration
+	    (keyboard-layout keyboard-layout))))
+    %my-desktop-services))
+  (bootloader
+   (bootloader-configuration
+    (bootloader grub-bootloader)
+    (targets (list "/dev/sda"))
+    (keyboard-layout keyboard-layout)))
+  (swap-devices
+   (list (swap-space
+	  (target
+	   "/dev/sda2"))))
+  (file-systems
+   (cons* (file-system
+	   (mount-point "/")
+	   (device (file-system-label "root"))
+	   (type "ext4"))
+	  %base-file-systems)))
