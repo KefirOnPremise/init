@@ -1,4 +1,5 @@
-(use-modules (gnu))
+(use-modules (gnu)
+	     (kefir services desktop))
 (use-service-modules cups
 		     desktop
 		     networking
@@ -6,9 +7,9 @@
 		     xorg
 		     docker)
 
-(define %my-desktop-services
+(define %local-desktop-services
   (modify-services
-   %desktop-services
+   %kefir-desktop-services
    (guix-service-type
     config =>
     (guix-configuration
@@ -20,13 +21,7 @@
        (list
 	(plain-file
 	 "bordeaux.guix.gnu.org.signing.key"
-	 "
-(public-key
- (ecc
-  (curve Ed25519)
-  (q #7D602902D3A2DBB83F8A0FB98602A754C5493B0B778C8D1DD4E0F41DE14DE34F#)
-  )
- )"))
+	 %bordeaux-public-key))
        %default-authorized-guix-keys))))))
 
 (operating-system
@@ -53,15 +48,7 @@
 	   "emacs-desktop-environment")
 	  (specification->package "nss-certs"))
     %base-packages))
-  (services
-   (append
-    (list (service openssh-service-type)
-	  (service tor-service-type)
-	  (service docker-service-type)
-	  (set-xorg-configuration
-	   (xorg-configuration
-	    (keyboard-layout keyboard-layout))))
-    %my-desktop-services))
+  (services  %local-desktop-services)
   (bootloader
    (bootloader-configuration
     (bootloader grub-bootloader)
