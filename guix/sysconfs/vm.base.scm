@@ -1,9 +1,9 @@
 (use-modules (gnu)
 	     ((kefir misc base) #:prefix kefir-misc:))
-(use-service-modules desktop networking ssh xorg)
+(use-service-modules desktop networking ssh xorg docker)
 
 (define my-system-supplementary-groups
-  '("wheel" "netdev" "audio" "video"))
+  '("wheel" "netdev" "audio" "video" "docker"))
 
 (define my-system-packages
   (append
@@ -24,7 +24,8 @@
   (append
    my-basic-services
    (list
-    (service openssh-service-type))))
+    (service openssh-service-type)
+    (service docker-service-type))))
 
 (operating-system
  (locale "en_US.utf8")
