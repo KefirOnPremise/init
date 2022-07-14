@@ -21,17 +21,3 @@ mkfs.ext4 -L root /dev/sda3
 # mount root and start store
 mount /dev/sda3 /mnt
 herd start cow-store /mnt
-
-guix pull --substitute-urls=https://bordeaux.guix.gnu.org
-bash -c "guix install git --substitute-urls=https://bordeaux.guix.gnu.org"
-cd /mnt
-bash -c "git clone https://github.com/KefirOnPremise/init.git"
-guix pull \
-     -C ./init/guix/channels \
-     --allow-downgrades \
-     --substitute-urls=https://bordeaux.guix.gnu.org
-bash \
-    -c "
-guix system init /mnt/init/guix/sysconfs/imp_virtbox /mnt \
-     --substitute-urls=https://bordeaux.guix.gnu.org
-"
