@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+#https://osboot.org/docs/gnulinux/guix.html
+
 # bios/mbr
 # NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
 # sda      8:0    0 68.2G  0 disk
@@ -16,7 +18,8 @@ cryptsetup luksFormat --type luks2 /dev/sda3
 cryptsetup open /dev/sda3 cryptroot
 
 # format partitions and turn on swap
-mkfs.ext2 /dev/sda1
+# mkfs.ext2 /dev/sda1
+mkfs.ext4 /dev/sda1
 mkswap /dev/sda2
 swapon /dev/sda2
 mkfs.ext4 /dev/mapper/cryptroot
