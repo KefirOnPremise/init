@@ -12,12 +12,15 @@ parted /dev/sda set 1 boot on
 parted /dev/sda mkpart primary linux-swap 100MiB 4GiB
 parted /dev/sda mkpart primary ext3 4GiB 100%
 
+cryptsetup luksFormat --type luks2 /dev/sda3
+cryptsetup open /dev/sda3 cryptroot
+
 # format partitions and turn on swap
 mkfs.ext2 /dev/sda1
 mkswap /dev/sda2
 swapon /dev/sda2
-mkfs.ext4 -L root /dev/sda3
+mkfs.ext4 /dev/mapper/cryptroot
 
 # mount root and start store
-mount /dev/sda3 /mnt
+mount /dev/mapper/cryptroot /mnt
 herd start cow-store /mnt
